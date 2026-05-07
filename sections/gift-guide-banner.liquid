@@ -1,0 +1,114 @@
+<section>
+    <div class="gift-guide-banner desktop">
+        <img
+            class="gift-guide-banner__bg"
+            src="{{ 'banner-bg.png' | asset_url }}"
+            alt="Gift Guide banner background"
+            loading="eager"
+            width="1920"
+            height="700"
+        >
+        <div class="gift-guide-banner__content">
+            <h1 class="gift-guide-banner__heading">{{ section.settings.heading }}</h1>
+            <p class="gift-guide-banner__desc">{{ section.settings.description }}</p>
+            <a href="{{ section.settings.cta_url }}" class="gift-guide-banner__btn">
+                {{ section.settings.cta_label }}
+                <img src="{{ 'arrow-white.svg' | asset_url }}" alt="" aria-hidden="true" width="27" height="12" />
+            </a>
+        </div>
+    </div>
+    <div class="gift-guide-banner mobile">
+        <div class="gift-guide-banner__content">
+            <h1 class="gift-guide-banner__heading">{{ section.settings.heading_mobile }}</h1>
+            <p class="gift-guide-banner__desc">{{ section.settings.description_mobile }}</p>            
+        </div>
+        <div class="gift-guide-banner__bg-container">
+            <img
+                class="gift-guide-banner__bg"
+                src="{{ 'banner-bg-mb.png' | asset_url }}"
+                alt="Gift Guide banner background"
+                loading="eager"
+                width="1920"
+                height="700"
+            >
+            <a href="{{ section.settings.cta_url_mobile }}" class="gift-guide-banner__btn">
+                {{ section.settings.cta_label_mobile }}
+                <img src="{{ 'arrow-white.svg' | asset_url }}" alt="" aria-hidden="true" width="27" height="12" />
+            </a>
+        </div>
+    </div>
+
+    <p class="gift-guide-banner__attribution desktop">{{ section.settings.attribution }}</p>
+    <p class="gift-guide-banner__attribution mobile">{{ section.settings.attribution_mobile }}</p>
+</section>
+
+{% schema %}
+{
+    "name": "Gift Guide Banner",
+    "settings": [
+        {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading (Desktop)",
+            "default": "The Gift Guide"
+        },
+        {
+            "type": "textarea",
+            "id": "description",
+            "label": "Description (Desktop)",
+            "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+        },
+        {
+            "type": "text",
+            "id": "cta_label",
+            "label": "CTA Button Label (Desktop)",
+            "default": "SHOP NOW"
+        },
+        {
+            "type": "url",
+            "id": "cta_url",
+            "label": "CTA Button URL (Desktop)"
+        },
+        {
+            "type": "text",
+            "id": "attribution",
+            "label": "Attribution Text (Desktop)",
+            "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+        },
+        {
+            "type": "text",
+            "id": "heading_mobile",
+            "label": "Heading (Mobile)",
+            "default": "The Gift Guide"
+        },
+        {
+            "type": "textarea",
+            "id": "description_mobile",
+            "label": "Description (Mobile)",
+            "default": "Discover Joy: Your Ultimate Holiday Gift Destination."
+        },
+        {
+            "type": "text",
+            "id": "cta_label_mobile",
+            "label": "CTA Button Label (Mobile)",
+            "default": "SHOP NOW"
+        },
+        {
+            "type": "url",
+            "id": "cta_url_mobile",
+            "label": "CTA Button URL (Mobile)"
+        },
+        {
+            "type": "text",
+            "id": "attribution_mobile",
+            "label": "Attribution Text (Mobile)",
+            "default": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
+        }
+    ],
+    "presets": [
+        {
+            "name": "Gift Guide Banner"
+        }
+    ]
+}
+{% endschema %}

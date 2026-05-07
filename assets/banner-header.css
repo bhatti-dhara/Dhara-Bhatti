@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* ---- Page Base ---- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.gift-guide-page {
+    font-family: 'Jost', sans-serif;
+    background: #fff;
+    color: #000;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Header ---- */
+.gift-guide-header__bar {
+    background: #F5F5F5;
+    padding: 10px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.gift-guide-header__logo {
+    font-size: 18.82px;
+    font-weight: 600;
+    color: #000;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.gift-guide-header__tagline {
+    font-size: 16px;
+    line-height: 13.42px;
+    color: #000;
+    text-align: center;
+    flex: 1;
+}
+
+.gift-guide-header__cta, .gift-guide-banner__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 30px;
+    background: #FFF544;
+    color: #000;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20.48px;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+}
+
+.gift-guide-header__cta:hover, .gift-guide-banner__btn:hover {
+    opacity: 0.88;
+}
+
+/* ---- Banner ---- */
+.gift-guide-banner.desktop {
+    position: relative;
+    width: 100%;
+    height: 780px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.gift-guide-banner.desktop .gift-guide-banner__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center right;
+}
+
+.gift-guide-banner.desktop .gift-guide-banner__content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    padding: 0 64px 0 100px;
+    max-width: 634px;
+}
+
+.gift-guide-banner.desktop .gift-guide-banner__heading {
+    font-size: 70px;
+    font-weight: 500;
+    line-height: 100%;
+    color: #000;
+    margin-bottom: 60px;
+}
+
+.gift-guide-banner.desktop .gift-guide-banner__desc {
+    font-size: 20px;
+    font-weight: 400;   
+    color: #000;
+    line-height: 140%;
+    margin-bottom: 55px;
+}
+
+.gift-guide-banner.desktop .gift-guide-banner__btn {
+    width: fit-content;
+    background: #000;
+    color: #fff;
+    margin-bottom: 50px;
+}
+
+.gift-guide-banner.desktop .gift-guide-banner__btn:hover {
+    background: #333;
+}
+
+.gift-guide-banner.mobile {
+    display: none;
+}
+
+.gift-guide-banner__attribution {
+    background: #F5F5F5;
+    padding: 10px 50px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 13.42px;
+    color: #000;
+}
+
+.gift-guide-banner__attribution.mobile {
+    display: none;
+}
+
+.gift-guide-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+}
+
+.gift-guide-header__drawer {
+    display: none;
+}
+
+.gift-guide-header__toggle {
+    display: none;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.gift-guide-header__icon--close {
+    display: none;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+
+    /* -- Header bar -- */
+    .gift-guide-header {
+        flex-direction: column;
+        padding: 0;
+        gap: 0;
+    }
+
+    .gift-guide-header__bar {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        background: #F7F7F7;
+        position: relative;
+    }
+
+    .gift-guide-header__toggle {
+        display: inline-flex;
+        order: 1;
+    }
+
+    .gift-guide-header__logo {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        order: 2;
+    }
+
+    .gift-guide-header__tagline,
+    .gift-guide-header__cta {
+        display: none;
+    }
+
+    /* -- Drawer -- */
+    .gift-guide-header__drawer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        background: #F2F2F2;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+        padding: 0 20px;
+    }
+
+    .gift-guide-header__drawer-tagline {
+        font-size: 14px;
+        font-weight: 400;
+        color: #000;
+        line-height: 1.5;
+    }
+
+    .gift-guide-header__drawer-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 30px;
+        background: #FFF544;
+        color: #000;
+        font-family: 'Jost', sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .gift-guide-header__drawer-cta:hover {
+        opacity: 0.88;
+    }
+
+    .gift-guide-header.is-open .gift-guide-header__icon--hamburger {
+        display: none;
+    }
+
+    .gift-guide-header.is-open .gift-guide-header__icon--close {
+        display: inline-block;
+    }
+
+    .gift-guide-header.is-open .gift-guide-header__drawer {
+        max-height: 200px;
+        padding: 16px 20px 20px;
+        gap: 16px;
+    }
+
+    /* -- Banner mobile -- */
+    .gift-guide-banner.desktop {
+        display: none;
+    }
+
+    .gift-guide-banner.mobile {
+        display: block;
+        height: auto;
+    }
+
+    .gift-guide-banner.mobile .gift-guide-banner__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        padding: 50px 40px 25px;
+    }
+
+    .gift-guide-banner.mobile .gift-guide-banner__heading {
+        font-size: 30px;
+        font-weight: 500;
+        line-height: 100%;
+    }
+
+    .gift-guide-banner.mobile .gift-guide-banner__desc {
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 130%;
+        text-align: center;
+    }
+
+    .gift-guide-banner.mobile .gift-guide-banner__bg-container {
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+
+    .gift-guide-banner.mobile .gift-guide-banner__bg {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .gift-guide-banner.mobile .gift-guide-banner__btn {
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #000;
+        color: #fff;
+        padding: 12px 28px;
+        font-size: 16px;
+        line-height: 20.48px;
+        font-weight: 400;
+        white-space: nowrap;
+        z-index: 2;
+    }
+
+    .gift-guide-banner__attribution {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+
+    .gift-guide-banner__attribution.mobile {
+        display: flex;
+    }
+
+    .gift-guide-banner__attribution.desktop {
+        display: none;
+    }
+}
