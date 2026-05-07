@@ -2,67 +2,106 @@
 
 <div class="gift-guide-grid" id="gift-guide-grid-{{ section.id }}">
     <h2 class="gift-guide-grid__header">Tisso vison in the wild</h2>
+    
     {% if section.blocks.size > 0 %}
+        
+        {% comment %} Product cards container {% endcomment %}
         <div class="gift-guide-grid__products">
-        {% for block in section.blocks %}
-            {% assign product = all_products[block.settings.product] %}
-            {% if product != blank %}
-            <div class="gift-guide-grid__item" {{ block.shopify_attributes }}>
-                <a href="{{ product.url }}" class="gift-guide-grid__link">
-                    {% if product.featured_image %}
-                        <img
-                            src="{{ product.featured_image | image_url: width: 600 }}"
-                            alt="{{ product.featured_image.alt | escape }}"
-                            class="gift-guide-grid__image"
-                            loading="lazy"
-                            width="600"
-                            height="{{ 600 | divided_by: product.featured_image.aspect_ratio | round }}"
+            
+            {% for block in section.blocks %}
+                {% assign product = all_products[block.settings.product] %}
+                
+                {% if product != blank %}
+                    {% comment %} Product card {% endcomment %}
+                    <div class="gift-guide-grid__item" {{ block.shopify_attributes }}>
+                        
+                        <a href="{{ product.url }}" class="gift-guide-grid__link">
+                            
+                            {% comment %} Product image {% endcomment %}
+                            {% if product.featured_image %}
+                                <img
+                                    src="{{ product.featured_image | image_url: width: 600 }}"
+                                    alt="{{ product.featured_image.alt | escape }}"
+                                    class="gift-guide-grid__image"
+                                    loading="lazy"
+                                    width="600"
+                                    height="{{ 600 | divided_by: product.featured_image.aspect_ratio | round }}"
+                                >
+                            {% endif %}
+                        </a>
+                        
+                        {% comment %} Plus button to open the popup {% endcomment %}
+                        <button
+                            class="gift-guide-grid__plus-btn"
+                            aria-label="Quick add {{ product.title | escape }}"
+                            data-product-id="{{ product.id }}"
+                            data-price="{{ product.price_min | money }}"
                         >
-                    {% endif %}
-                </a>
-                <button
-                    class="gift-guide-grid__plus-btn"
-                    aria-label="Quick add {{ product.title | escape }}"
-                    data-product-id="{{ product.id }}"
-                    data-price="{{ product.price_min | money }}"
-                >
-                    <img src="{{ 'plus-icon.svg' | asset_url }}" alt="" aria-hidden="true" width="22" height="22" />
-                </button>
-                <script id="gg-product-{{ product.id }}" type="application/json">{{ product | json }}</script>
-            </div>
-            {% endif %}
-        {% endfor %}
+                            <img src="{{ 'plus-icon.svg' | asset_url }}" alt="" aria-hidden="true" width="22" height="22" />
+                        </button>
+
+                        {% comment %} Product data for the popup {% endcomment %}
+                        <script id="gg-product-{{ product.id }}" type="application/json">{{ product | json }}</script>
+
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+
         </div>
+
     {% else %}
+
         <p class="gift-guide-grid__empty">No products added. Use the "Add product" button in the theme editor.</p>
+
     {% endif %}
+
 </div>
 
 <!-- Quick Add Popup -->
 <div class="gg-popup-overlay" id="gg-popup-overlay" aria-hidden="true">
+    
     <div class="gg-popup" role="dialog" aria-modal="true" aria-labelledby="gg-popup-title">
+        
+        {% comment %} Close button {% endcomment %}
         <button class="gg-popup__close" id="gg-popup-close" aria-label="Close">
             <img src="{{ 'popup-close-icon.svg' | asset_url }}" alt="" aria-hidden="true" width="17" height="17" />
         </button>
+
+        {% comment %} Product details container {% endcomment %}
         <div class="gg-popup__body">
+            
+            {% comment %} Product image {% endcomment %}
             <div class="gg-popup__image-wrap">
                 <img src="" alt="" class="gg-popup__image" id="gg-popup-image" width="100%" height="100%">
             </div>
+            
+            {% comment %} Product details {% endcomment %}
             <div class="gg-popup__details">
                 <h3 class="gg-popup__title" id="gg-popup-title"></h3>
                 <p class="gg-popup__price" id="gg-popup-price"></p>
                 <p class="gg-popup__desc" id="gg-popup-desc"></p>                
             </div>            
         </div>
+        
+        {% comment %} Options container {% endcomment %}
         <div class="gg-popup__options-wrap">
+            
+            {% comment %} Options list {% endcomment %}
             <div class="gg-popup__options" id="gg-popup-options"></div>
+
+            {% comment %} Add to cart button {% endcomment %}
             <button class="gg-popup__atc" id="gg-popup-atc" type="button">
                 <span id="gg-popup-atc-text">ADD TO CART</span>
                 <img src="{{ 'arrow-white-long.svg' | asset_url }}" alt="" aria-hidden="true" width="36" height="12" />
             </button>
+
+            {% comment %} Error message {% endcomment %}
             <p class="gg-popup__error" id="gg-popup-error"></p>
         </div>
+
     </div>
+
 </div>
 
 <script>
@@ -81,11 +120,13 @@
     var currentProduct  = null;
     var selectedOptions = {};
 
+    // Resize Shopify image to the given size
     function resizeShopifyImage(url, size) {
         if (!url) return '';
         return url.replace(/(\.(jpg|jpeg|png|gif|webp))(\?.*)?$/i, '_' + size + '$1$3');
     }
 
+    // Get the selected variant
     function getSelectedVariant() {
         if (!currentProduct) return null;
         return currentProduct.variants.find(function (v) {
@@ -95,6 +136,7 @@
         });
     }
 
+    // Update the Add to Cart button state
     function updateAtcState() {
         var variant = getSelectedVariant();
         if (variant) {
@@ -111,6 +153,7 @@
         }
     }
 
+    // Render the options for the product
     function renderOptions() {
         popupOpts.innerHTML = '';
         if (!currentProduct) return;
@@ -130,6 +173,7 @@
             label.textContent = optName;
             group.appendChild(label);
 
+            // If the option is a color, render the color buttons
             if (/colou?r/i.test(optName)) {
                 var btnWrap = document.createElement('div');
                 btnWrap.className = 'gg-popup__option-btns';
@@ -158,6 +202,7 @@
                 });
                 group.appendChild(btnWrap);
             } else {
+                // If the option is not a color, render the select dropdown
                 var selWrap = document.createElement('div');
                 selWrap.className = 'gg-popup__select-wrap';
 
@@ -192,6 +237,7 @@
         });
     }
 
+    // Open the popup
     function openPopup(product, formattedPrice) {
         currentProduct  = product;
         selectedOptions = {};
@@ -219,6 +265,7 @@
             });
         }
 
+        // Render the options and update the Add to Cart button state
         renderOptions();
         updateAtcState();
 
@@ -227,6 +274,7 @@
         document.body.style.overflow = 'hidden';
     }
 
+    // Close the popup
     function closePopup() {
         overlay.classList.remove('active');
         overlay.setAttribute('aria-hidden', 'true');
@@ -235,6 +283,7 @@
         selectedOptions = {};
     }
 
+    // Add event listeners to the plus buttons
     document.querySelectorAll('.gift-guide-grid__plus-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
         e.preventDefault();
@@ -250,16 +299,20 @@
         });
     });
 
+    // Add event listeners to the close button
     closeBtn.addEventListener('click', closePopup);
 
+    // Add event listeners to the overlay
     overlay.addEventListener('click', function (e) {
         if (e.target === overlay) closePopup();
     });
 
+    // Add event listeners to the escape key
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && overlay.classList.contains('active')) closePopup();
     });
 
+    // Add event listeners to the Add to Cart button
     popupAtc.addEventListener('click', function () {
         var variantId = parseInt(popupAtc.dataset.variantId, 10);
         if (!variantId) return;
@@ -268,6 +321,7 @@
         atcText.textContent  = 'Adding...';
         popupErr.textContent = '';
 
+        // Add the product to the cart
         fetch('/cart/add.js', {
             method: 'POST',
             headers: {
