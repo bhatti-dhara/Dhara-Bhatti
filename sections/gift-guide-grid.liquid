@@ -1,0 +1,331 @@
+{{ 'product-grid.css' | asset_url | stylesheet_tag }}
+
+<div class="gift-guide-grid" id="gift-guide-grid-{{ section.id }}">
+    <h2 class="gift-guide-grid__header">Tisso vison in the wild</h2>
+    {% if section.blocks.size > 0 %}
+        <div class="gift-guide-grid__products">
+        {% for block in section.blocks %}
+            {% assign product = all_products[block.settings.product] %}
+            {% if product != blank %}
+            <div class="gift-guide-grid__item" {{ block.shopify_attributes }}>
+                <a href="{{ product.url }}" class="gift-guide-grid__link">
+                    {% if product.featured_image %}
+                        <img
+                            src="{{ product.featured_image | image_url: width: 600 }}"
+                            alt="{{ product.featured_image.alt | escape }}"
+                            class="gift-guide-grid__image"
+                            loading="lazy"
+                            width="600"
+                            height="{{ 600 | divided_by: product.featured_image.aspect_ratio | round }}"
+                        >
+                    {% endif %}
+                </a>
+                <button
+                    class="gift-guide-grid__plus-btn"
+                    aria-label="Quick add {{ product.title | escape }}"
+                    data-product-id="{{ product.id }}"
+                    data-price="{{ product.price_min | money }}"
+                >
+                    <img src="{{ 'plus-icon.svg' | asset_url }}" alt="" aria-hidden="true" width="22" height="22" />
+                </button>
+                <script id="gg-product-{{ product.id }}" type="application/json">{{ product | json }}</script>
+            </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% else %}
+        <p class="gift-guide-grid__empty">No products added. Use the "Add product" button in the theme editor.</p>
+    {% endif %}
+</div>
+
+<!-- Quick Add Popup -->
+<div class="gg-popup-overlay" id="gg-popup-overlay" aria-hidden="true">
+    <div class="gg-popup" role="dialog" aria-modal="true" aria-labelledby="gg-popup-title">
+        <button class="gg-popup__close" id="gg-popup-close" aria-label="Close">
+            <img src="{{ 'popup-close-icon.svg' | asset_url }}" alt="" aria-hidden="true" width="17" height="17" />
+        </button>
+        <div class="gg-popup__body">
+            <div class="gg-popup__image-wrap">
+                <img src="" alt="" class="gg-popup__image" id="gg-popup-image" width="100%" height="100%">
+            </div>
+            <div class="gg-popup__details">
+                <h3 class="gg-popup__title" id="gg-popup-title"></h3>
+                <p class="gg-popup__price" id="gg-popup-price"></p>
+                <p class="gg-popup__desc" id="gg-popup-desc"></p>                
+            </div>            
+        </div>
+        <div class="gg-popup__options-wrap">
+            <div class="gg-popup__options" id="gg-popup-options"></div>
+            <button class="gg-popup__atc" id="gg-popup-atc" type="button">
+                <span id="gg-popup-atc-text">ADD TO CART</span>
+                <img src="{{ 'arrow-white-long.svg' | asset_url }}" alt="" aria-hidden="true" width="36" height="12" />
+            </button>
+            <p class="gg-popup__error" id="gg-popup-error"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var overlay    = document.getElementById('gg-popup-overlay');
+    var closeBtn   = document.getElementById('gg-popup-close');
+    var popupImg   = document.getElementById('gg-popup-image');
+    var popupTitle = document.getElementById('gg-popup-title');
+    var popupPrice = document.getElementById('gg-popup-price');
+    var popupDesc  = document.getElementById('gg-popup-desc');
+    var popupOpts  = document.getElementById('gg-popup-options');
+    var popupAtc   = document.getElementById('gg-popup-atc');
+    var atcText    = document.getElementById('gg-popup-atc-text');
+    var popupErr   = document.getElementById('gg-popup-error');
+
+    var currentProduct  = null;
+    var selectedOptions = {};
+
+    function resizeShopifyImage(url, size) {
+        if (!url) return '';
+        return url.replace(/(\.(jpg|jpeg|png|gif|webp))(\?.*)?$/i, '_' + size + '$1$3');
+    }
+
+    function getSelectedVariant() {
+        if (!currentProduct) return null;
+        return currentProduct.variants.find(function (v) {
+        return currentProduct.options.every(function (opt, idx) {
+            return v['option' + (idx + 1)] === selectedOptions[opt];
+        });
+        });
+    }
+
+    function updateAtcState() {
+        var variant = getSelectedVariant();
+        if (variant) {
+        popupAtc.disabled = !variant.available;
+        popupAtc.dataset.variantId = variant.id;
+        if (!variant.available) {
+            atcText.textContent = 'SOLD OUT';
+        } else {
+            atcText.textContent = 'ADD TO CART';
+        }
+        } else {
+        popupAtc.disabled = true;
+        delete popupAtc.dataset.variantId;
+        }
+    }
+
+    function renderOptions() {
+        popupOpts.innerHTML = '';
+        if (!currentProduct) return;
+
+        currentProduct.options.forEach(function (optName, idx) {
+            var key    = 'option' + (idx + 1);
+            var values = [];
+            currentProduct.variants.forEach(function (v) {
+                if (v[key] && values.indexOf(v[key]) === -1) values.push(v[key]);
+            });
+
+            var group = document.createElement('div');
+            group.className = 'gg-popup__option-group';
+
+            var label = document.createElement('p');
+            label.className = 'gg-popup__option-label';
+            label.textContent = optName;
+            group.appendChild(label);
+
+            if (/colou?r/i.test(optName)) {
+                var btnWrap = document.createElement('div');
+                btnWrap.className = 'gg-popup__option-btns';
+                btnWrap.style.setProperty('--gg-btn-count', values.length);
+                var initialIdx = selectedOptions[optName] ? values.indexOf(selectedOptions[optName]) : 0;
+                btnWrap.style.setProperty('--gg-active-idx', initialIdx >= 0 ? initialIdx : 0);
+
+                values.forEach(function (val) {
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'gg-popup__option-btn';
+                    btn.textContent = val;
+                    if (selectedOptions[optName] === val) btn.classList.add('active');
+
+                    btn.addEventListener('click', function () {
+                        selectedOptions[optName] = val;
+                        var clickedIdx = values.indexOf(val);
+                        btnWrap.style.setProperty('--gg-active-idx', clickedIdx);
+                        btnWrap.querySelectorAll('.gg-popup__option-btn').forEach(function (b) {
+                            b.classList.toggle('active', b.textContent === val);
+                        });
+                        updateAtcState();
+                    });
+
+                    btnWrap.appendChild(btn);
+                });
+                group.appendChild(btnWrap);
+            } else {
+                var selWrap = document.createElement('div');
+                selWrap.className = 'gg-popup__select-wrap';
+
+                var sel = document.createElement('select');
+                sel.className = 'gg-popup__option-select';
+
+                var placeholder = document.createElement('option');
+                placeholder.value    = '';
+                placeholder.textContent = 'Choose your ' + optName.toLowerCase();
+                placeholder.disabled = true;
+                if (!selectedOptions[optName]) placeholder.selected = true;
+                sel.appendChild(placeholder);
+
+                values.forEach(function (val) {
+                    var opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = val;
+                    if (selectedOptions[optName] === val) opt.selected = true;
+                        sel.appendChild(opt);
+                });
+
+                sel.addEventListener('change', function () {
+                    selectedOptions[optName] = this.value;
+                    updateAtcState();
+                });
+
+                selWrap.appendChild(sel);
+                group.appendChild(selWrap);
+            }
+
+            popupOpts.appendChild(group);
+        });
+    }
+
+    function openPopup(product, formattedPrice) {
+        currentProduct  = product;
+        selectedOptions = {};
+        popupErr.textContent = '';
+        popupErr.style.display = 'none';
+        atcText.textContent  = 'ADD TO CART';
+
+        var featuredImg = product.featured_image;
+        var imgSrc = featuredImg ? (typeof featuredImg === 'string' ? featuredImg : (featuredImg.src || '')) : '';
+        popupImg.src = resizeShopifyImage(imgSrc, '200x200');
+        popupImg.alt = product.title;
+
+        popupTitle.textContent = product.title;
+        popupPrice.textContent = formattedPrice;
+
+        var tmp = document.createElement('div');
+        tmp.innerHTML = product.description || '';
+        var desc = (tmp.textContent || tmp.innerText || '').trim();
+        popupDesc.textContent = desc.length > 130 ? desc.slice(0, 130) + '...' : desc;
+
+        if (product.variants && product.variants.length) {
+            product.options.forEach(function (opt, idx) {
+                var val = product.variants[0]['option' + (idx + 1)];
+                if (val) selectedOptions[opt] = val;
+            });
+        }
+
+        renderOptions();
+        updateAtcState();
+
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePopup() {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        currentProduct  = null;
+        selectedOptions = {};
+    }
+
+    document.querySelectorAll('.gift-guide-grid__plus-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var scriptEl = document.getElementById('gg-product-' + btn.dataset.productId);
+        if (!scriptEl) return;
+            try {
+                var product = JSON.parse(scriptEl.textContent);
+                openPopup(product, btn.dataset.price);
+            } catch (err) {
+                console.error('Gift guide: failed to parse product data', err);
+            }
+        });
+    });
+
+    closeBtn.addEventListener('click', closePopup);
+
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closePopup();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closePopup();
+    });
+
+    popupAtc.addEventListener('click', function () {
+        var variantId = parseInt(popupAtc.dataset.variantId, 10);
+        if (!variantId) return;
+
+        popupAtc.disabled    = true;
+        atcText.textContent  = 'Adding...';
+        popupErr.textContent = '';
+
+        fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ id: variantId, quantity: 1 })
+        })
+        .then(function (res) {
+            if (!res.ok) {
+                return res.json().then(function (data) {
+                    throw new Error(data.description || data.message || 'Could not add to cart.');
+                });
+            }
+            return res.json();
+        })
+        .then(function () {
+            atcText.textContent = 'Added!';
+            document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+            fetch('/cart.js')
+            .then(function (r) { return r.json(); })
+            .then(function (cart) {
+                document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart, bubbles: true }));
+            });
+            setTimeout(closePopup, 900);
+        })
+        .catch(function (err) {
+            popupAtc.disabled   = false;
+            atcText.textContent = 'ADD TO CART';
+            popupErr.textContent = err.message || 'Could not add to cart. Please try again.';
+            popupErr.style.display = 'block';
+        });
+    });
+})();
+</script>
+
+{% schema %}
+{
+    "name": "Gift Guide Grid",
+    "settings": [],
+    "blocks": [
+        {
+        "type": "product",
+        "name": "Product",
+        "settings": [
+            {
+            "type": "product",
+            "id": "product",
+            "label": "Select product"
+            }
+        ]
+        }
+    ],
+    "max_blocks": 6,
+    "presets": [
+        {
+        "name": "Gift Guide Grid"
+        }
+    ]
+}
+{% endschema %}
