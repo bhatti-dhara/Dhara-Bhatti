@@ -1,39 +1,59 @@
 {{ 'banner-header.css' | asset_url | stylesheet_tag }}
 
 <header class="gift-guide-header" id="gift-guide-header">
+    
+    {% comment %} Header bar {% endcomment %}
     <div class="gift-guide-header__bar">
         {%- assign hamburger_url = 'hamburger-icon.svg' | asset_url -%}
         {%- assign close_url = 'close-icon.svg' | asset_url -%}
+        
         <button class="gift-guide-header__toggle" aria-expanded="false" aria-label="Toggle menu">
-        <img
-            src="{{ hamburger_url }}"
-            class="gift-guide-header__icon gift-guide-header__icon--hamburger"
-            alt="Open menu"
-            width="20"
-            height="12"
-        >
-        <img
-            src="{{ close_url }}"
-            class="gift-guide-header__icon gift-guide-header__icon--close"
-            alt="Close menu"
-            width="15"
-            height="15"
-        >
+            
+            {% comment %} Hamburger icon {% endcomment %}
+            <img
+                src="{{ hamburger_url }}"
+                class="gift-guide-header__icon gift-guide-header__icon--hamburger"
+                alt="Open menu"
+                width="20"
+                height="12"
+            >
+            
+                {% comment %} Close icon {% endcomment %}
+            <img
+                src="{{ close_url }}"
+                class="gift-guide-header__icon gift-guide-header__icon--close"
+                alt="Close menu"
+                width="15"
+                height="15"
+            >
         </button>
-        <span class="gift-guide-header__logo">{{ section.settings.logo_text }}</span>
-        <p class="gift-guide-header__tagline">{{ section.settings.tagline }}</p>
-        <a href="{{ section.settings.cta_url }}" class="gift-guide-header__cta">
-        {{ section.settings.cta_label }}
-        <img src="{{ 'arrow-black.svg' | asset_url }}" alt="" aria-hidden="true" width="26" height="12" />
-        </a>
-  </div>
 
-  <div class="gift-guide-header__drawer" aria-hidden="true">
-        <p class="gift-guide-header__drawer-tagline">{{ section.settings.tagline }}</p>
-        <a href="{{ section.settings.cta_url }}" class="gift-guide-header__drawer-cta">
-        {{ section.settings.cta_label }}
-        <img src="{{ 'arrow-black.svg' | asset_url }}" alt="" aria-hidden="true" width="26" height="12" />
+        
+        {% comment %} Logo {% endcomment %}
+        <span class="gift-guide-header__logo">{{ section.settings.logo_text }}</span>
+        
+        {% comment %} Tagline {% endcomment %}
+        <p class="gift-guide-header__tagline">{{ section.settings.tagline }}</p>
+        
+        {% comment %} CTA button {% endcomment %}
+        <a href="{{ section.settings.cta_url }}" class="gift-guide-header__cta">
+            {{ section.settings.cta_label }}
+            <img src="{{ 'arrow-black.svg' | asset_url }}" alt="" aria-hidden="true" width="26" height="12" />
         </a>
+    </div>
+
+    {% comment %} Drawer menu for mobile {% endcomment %}
+    <div class="gift-guide-header__drawer" aria-hidden="true">
+        
+        {% comment %} Tagline {% endcomment %}
+        <p class="gift-guide-header__drawer-tagline">{{ section.settings.tagline }}</p>
+        
+        {% comment %} CTA button {% endcomment %}
+        <a href="{{ section.settings.cta_url }}" class="gift-guide-header__drawer-cta">
+            {{ section.settings.cta_label }}
+            <img src="{{ 'arrow-black.svg' | asset_url }}" alt="" aria-hidden="true" width="26" height="12" />
+        </a>
+
     </div>
 </header>
 
@@ -43,10 +63,11 @@
         var toggle = header.querySelector('.gift-guide-header__toggle');
         var drawer = header.querySelector('.gift-guide-header__drawer');
 
+        // Add event listeners to the toggle button
         toggle.addEventListener('click', function () {
-        var isOpen = header.classList.toggle('is-open');
-        toggle.setAttribute('aria-expanded', String(isOpen));
-        drawer.setAttribute('aria-hidden', String(!isOpen));
+            var isOpen = header.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', String(isOpen));
+            drawer.setAttribute('aria-hidden', String(!isOpen));
         });
     })();
 </script>

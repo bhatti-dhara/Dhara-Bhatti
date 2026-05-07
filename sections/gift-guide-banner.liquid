@@ -1,5 +1,8 @@
 <section>
+    {% comment %} Desktop banner {% endcomment %}
     <div class="gift-guide-banner desktop">
+        
+        {% comment %} Background image {% endcomment %}
         <img
             class="gift-guide-banner__bg"
             src="{{ 'banner-bg.png' | asset_url }}"
@@ -8,20 +11,31 @@
             width="1920"
             height="700"
         >
+        
+        {% comment %} Content container {% endcomment %}
         <div class="gift-guide-banner__content">
             <h1 class="gift-guide-banner__heading">{{ section.settings.heading }}</h1>
             <p class="gift-guide-banner__desc">{{ section.settings.description }}</p>
+            
+            {% comment %} CTA button {% endcomment %}
             <a href="{{ section.settings.cta_url }}" class="gift-guide-banner__btn">
                 {{ section.settings.cta_label }}
                 <img src="{{ 'arrow-white.svg' | asset_url }}" alt="" aria-hidden="true" width="27" height="12" />
             </a>
         </div>
+
     </div>
+    
+    {% comment %} Mobile banner {% endcomment %}
     <div class="gift-guide-banner mobile">
+        
+        {% comment %} Background image {% endcomment %}
         <div class="gift-guide-banner__content">
             <h1 class="gift-guide-banner__heading">{{ section.settings.heading_mobile }}</h1>
             <p class="gift-guide-banner__desc">{{ section.settings.description_mobile }}</p>            
         </div>
+        
+        {% comment %} Background image container {% endcomment %}
         <div class="gift-guide-banner__bg-container">
             <img
                 class="gift-guide-banner__bg"
@@ -31,6 +45,8 @@
                 width="1920"
                 height="700"
             >
+            
+            {% comment %} CTA button {% endcomment %}
             <a href="{{ section.settings.cta_url_mobile }}" class="gift-guide-banner__btn">
                 {{ section.settings.cta_label_mobile }}
                 <img src="{{ 'arrow-white.svg' | asset_url }}" alt="" aria-hidden="true" width="27" height="12" />
@@ -38,7 +54,10 @@
         </div>
     </div>
 
+    {% comment %} Attribution text for desktop {% endcomment %}
     <p class="gift-guide-banner__attribution desktop">{{ section.settings.attribution }}</p>
+    
+    {% comment %} Attribution text for mobile {% endcomment %}
     <p class="gift-guide-banner__attribution mobile">{{ section.settings.attribution_mobile }}</p>
 </section>
 
